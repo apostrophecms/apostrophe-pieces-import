@@ -1,6 +1,6 @@
 {
   "name": "apostrophe-pieces-import",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Import pieces from CSV (and potentially other formats) as pieces in Apostrophe, with a nice UI",
   "main": "index.js",
   "scripts": {
@@ -26,6 +26,7 @@
   "dependencies": {
     "csv-parse": "^1.1.7",
     "cuid": "^1.3.8",
-    "lodash": "^4.17.2"
+    "lodash": "^4.17.2",
+    "split": "^1.0.0"
   }
 }
