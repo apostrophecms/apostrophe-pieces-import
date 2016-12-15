@@ -1,0 +1,23 @@
+{% if data.finished %}
+  <h3>{{ __('Import finished') }}</h3>
+  <table class="apos-pieces-import-results">
+    <tr>
+      <th>{{ __('Items imported') }}</th><td>{{ data.accepted }}</td>
+    </tr>
+    <tr class="{{ 'apos-pieces-import-errors' if data.errors }}">
+      <th>{{ __('Errors') }}</th><td>{{ data.errors }}</td>
+    </tr>
+  </table>
+{% elif data.failed %}
+  <h3 class="apos-pieces-import-failed">{{ __('Import failed, the file is most likely not in a supported format') }}</h3>
+{% elif data.notFound %}
+  {# Should this just look the same as the hard-error case above? #}
+  <h3 class="apos-pieces-import-not-found">{{ __('Import job not found, please retry') }}</h3>
+{% else %}
+  <div class="apos-pieces-import-progress" data-apos-progress>
+    <div class="apos-pieces-import-progress-percentage">{{ data.percentage }}%</div>
+    <div class="apos-pieces-import-progress-indicator"
+      data-apos-progress-indicator
+      style="width: {{ data.percentage }}%"></div>
+  </div>
+{% endif %}

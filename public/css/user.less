@@ -1,0 +1,67 @@
+.apos-pieces-import
+{
+  .apos-pieces-import-done
+  {
+    display: none;
+  }
+}
+
+.apos-modal-body
+{
+  .apos-pieces-import-body
+  {
+    max-width: 400px;
+    margin: auto;
+    margin-top: 20px;
+    margin-bottom: 20px;
+
+    .apos-pieces-import-progress
+    {
+      width: 100%;
+      height: 40px;
+      border: 2px solid gray;
+      background-color: @apos-secondary;
+      box-sizing: border-box;
+      position: relative;
+    }
+
+    .apos-pieces-import-progress-percentage
+    {
+      position: absolute;
+      top: 10px;
+      width: 100%;
+      height: 100%;
+      text-align: center;
+      color: @apos-white;
+    }
+
+    .apos-pieces-import-progress-indicator
+    {
+      height: 100%;
+      background-color: @apos-primary;
+    }
+
+    input
+    {
+      background-color: lighten(@apos-primary, 5%);
+      display: inline-block;
+      padding: 24px;
+    }
+    
+    h3
+    {
+      font-size: 24px;
+      margin-bottom: 24px;
+    }
+    
+    table
+    {
+      td, th {
+        padding: 10px 10px 0 0;
+        text-align: left;
+      }
+    }
+
+  }
+  
+}

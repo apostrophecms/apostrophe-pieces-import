@@ -1,0 +1,31 @@
+{%- extends "apostrophe-modal:baseSlideable.html" -%}
+{%- import 'apostrophe-ui:components/buttons.html' as buttons -%}
+
+{%- block modalClass -%}
+  apos-pieces-import {{ data.options.name | css }}-import apos-ui-modal-no-sidebar apos-modal-slideable
+{%- endblock -%}
+
+{%- block controls -%}
+  {# The different classes are used to swap which of these is visible. #}
+  {{ buttons.base('Cancel', { action: 'cancel' }, 'apos-button--minor apos-pieces-import-cancel') }}
+  {{ buttons.major('Done', { action: 'cancel' }, 'apos-button--major apos-pieces-import-done') }}
+{%- endblock -%}
+
+{%- block label -%}
+  {{ __('Import %s', data.options.pluralLabel) }}
+{%- endblock -%}
+
+{%- block body -%}
+  <div class="apos-pieces-import-body">
+    {# The upload is actually implemented via jquery fileupload enhancement of the file button. -Tom #}
+    <form class="apos-form" data-apos-form enctype="multipart/form-data" method="POST">
+      <input class="apos-file" name="file" type="file" data-apos-file />
+    </form>
+    {# ajax populates me, see progress.html #}
+    <div data-apos-progress-container class="apos-pieces-import-progress-container"></div>
+  </div>
+{%- endblock -%}
+
+{%- block instructions -%}
+  Select a file to upload and import {{ data.options.pluralLabel }}. Please note: if you import the same content twice, it will be duplicated.
+{%- endblock -%}

@@ -1,0 +1,12 @@
+{# This file must be imported 'with context' from a pieces module #}
+{# subclass. -Tom #}
+
+{# bring in modals #}
+{%- import "apostrophe-modal:macros.html" as modals -%}
+{# bring in ui components #}
+{%- import 'apostrophe-ui:components/buttons.html' as buttons with context -%}
+
+{%- macro piecesImportControls() -%}
+  {{ buttons.major('Import ' + data.options.label, { action: 'import' }) }}
+{%- endmacro -%}
+
