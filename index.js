@@ -376,8 +376,7 @@ module.exports = {
     self.importAfterInsert = function(job, record, piece, callback) {
       // It's OK to invoke this callback synchronously because we know the previous
       // operation (insert) is always async, so there is no stack crash risk. -Tom
-      return setTimeout(callback, 1000);
-      // return callback(null);
+      return callback(null);
     };
     
     self.importFailed = function(job, err) {
