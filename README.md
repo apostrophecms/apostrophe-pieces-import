@@ -73,6 +73,15 @@ can be piped into; the stream should emit readable events and support the read()
 in the usual way, and emit events in the usual way. The
 read() method of the stream must return an object with property names hopefully corresponding to schema field names.
 
+**Alternative:** `parse` may also be a function that, accepting the filename
+as its first argument and a callback as its second argument, parses the data and
+invokes the callback with `(null, array)` where `array` containing one object for each
+row, with property names corresponding
+to the column headers as appropriate. In the event of an error, the error should be
+passed to the callback as the first argument. This option is to be avoided for very large
+files but it is useful when importing formats for which no streaming interface
+is available.
+
 `convert` should be set to `'string'` if the properties of each object read
 from the stream are always strings, or `form` if they correspond to the format submitted
 by apostrophe's forms on the front end. If in doubt, use `string`.

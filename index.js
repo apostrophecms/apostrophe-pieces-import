@@ -45,23 +45,36 @@ module.exports = {
         // Use the schema field converters for plaintext strings
         convert: 'string',
         sniff: function(originalFilename, actualFilename) {
-          return filename.match(/\.tsv$/i);
+          return originalFilename.match(/\.tsv$/i);
         },
         count: function(filename, callback) {
           return countLinesInFile(filename, callback);
         }
-      }
+      },
+      excel: require('./lib/excel.js')
     };
     
     // Add support for a new input format. `name` is the typical file extension, such as `csv`.
     // `format` is an object with, at a minimum, `parse`, `convert`, `sniff` and
     // `count` properties.
     //
-    // `parse` must be a function that, taking no arguments, returns a node.js stream that a file
+    // There are two acceptable forms for `parse`:
+    //
+    // 1. A function that, taking no arguments, returns a node.js stream that a file
     // can be piped into; the stream should emit readable events and support the read() method
     // in the usual way, and emit events in the usual way. The
     // read() method of the stream must return an object with property names corresponding to the column
-    // names and values corresponding to the values for each column in this row.
+    // names and values corresponding to the values for each column in this row. This
+    // form is preferred because it avoids exhausting memory and/or pausing the
+    // website by reading and parsing large files synchronously.
+    //
+    // 2. A function that, accepting the filename as its first argument and a callback as
+    // its second argument, parses the data and invokes the callback with `(null, array)`
+    // where `array` containing one object for each row, with property names corresponding
+    // to the column headers as appropriate. In the event of an error an error should be
+    // passed to the callback as the first argument. This option is to be avoided for very large
+    // files but it is useful when importing formats for which no streaming interface
+    // is available.
     //
     // `convert` should be set to `'string'` if the properties of each object read
     // from the stream are always strings, or `form` if they correspond to the format submitted
@@ -75,7 +88,7 @@ module.exports = {
     //
     // `count` is an async function that takes a filename and a callback, and invokes the callback
     // with an error if any, and the number of records in the file as the second argument. It is
-    // used for progress display.
+    // used for progress display. An approximate number is acceptable.
 
     self.importAddFormat = function(name, format) {
       self.importFormats[name] = format;
@@ -154,13 +167,35 @@ module.exports = {
             console.error(err);
             return self.importFailed(job);
           }
-          // Now kick off the real stream processing
-          var parser = job.format.parse();
-          parser.on('readable', _.partial(self.importRecordsWhileAvailable, job));
-          parser.on('error', _.partial(self.importFailed, job));
-          parser.on('finish', _.partial(self.importFinished, job));
-          fs.createReadStream(file.path).pipe(parser);
-          job.parser = parser;
+          if (job.format.parse.length === 0) {
+            // Now kick off the stream processing
+            var parser = job.format.parse();
+            parser.on('readable', _.partial(self.importRecordsWhileAvailable, job));
+            parser.on('error', _.partial(self.importFailed, job));
+            parser.on('finish', _.partial(self.importFinished, job));
+            fs.createReadStream(file.path).pipe(parser);
+            job.parser = parser;
+          } else {
+            // Allow the simpler type of parse function to drive the
+            // same methods that otherwise listen to a stream
+            return job.format.parse(file.path, function(err, data) {
+              if (err) {
+                console.error(err);
+                return self.importFailed(job);
+              }
+              var i = 0;
+              job.parser = {
+                read: function() {
+                  if (i === data.length) {
+                    self.importFinished(job);
+                    return false;
+                  }
+                  return data[i++];
+                }
+              };
+              self.importRecordsWhileAvailable(job);          
+            });
+          }
         });
 
         function insertAndSniff(callback) {

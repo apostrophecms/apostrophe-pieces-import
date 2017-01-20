@@ -2,8 +2,6 @@
 // each time you click "Add" or click to edit an existing piece. Relies on
 // [apostrophe-schemas](../apostrophe-schemas/index.html) to edit the fields.
 
-console.log('defining');
-
 apos.define('apostrophe-pieces-import-modal', {
 
   extend: 'apostrophe-modal',
@@ -41,9 +39,9 @@ apos.define('apostrophe-pieces-import-modal', {
     };
     
     self.startProgress = function() {
-      self.progressInterval = setInterval(self.updateProgress, 5000);
+      self.progressInterval = setInterval(self.updateProgress, 1000);
       self.updateProgress();
-    }
+    };
     
     self.updateProgress = function() {
       return self.api('import-progress', { _id: self.jobId }, function(data) {
@@ -62,6 +60,9 @@ apos.define('apostrophe-pieces-import-modal', {
       if (self.progressInterval) {
         clearInterval(self.progressInterval);
       }
+      if (self.finished) {
+        apos.change(self.manager.name);
+      }
     };
     
     self.hideForm = function() {
@@ -69,9 +70,9 @@ apos.define('apostrophe-pieces-import-modal', {
     };
 
     self.beforeCancel = function(callback) {
-      console.log('in beforeCancel');
       if ((!self.jobId) || (self.finished)) {
-        // Easy to cancel when we haven't even started yet
+        // Easy to cancel when we haven't even started yet;
+        // impossible to cancel once we're finished
         return setImmediate(callback);
       }
       apos.ui.globalBusy(true);
