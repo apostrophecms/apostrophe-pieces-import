@@ -1,5 +1,9 @@
 # Changelog
 
+** 2.0.1
+
+* Documentation improvements.
+
 ** 2.0.0
 
 * Introduced simplified alternate interface for custom file format parsers. If a stream interface is not available you can use a simple callback interface, at the price of keeping all of the data in RAM during the import, which for many file formats (notably Excel) is acceptable. A convenience wrapper automatically invokes these simplified parsers without the need to change the rest of the import logic.

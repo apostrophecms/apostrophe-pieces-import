@@ -30,15 +30,15 @@ modules: {
 {%- endblock -%}
 ```
 
-## Preparing the CSV file
+## Preparing the data file
 
-The CSV file must have a `.csv` extension. 
+CSV files must have a `.csv` extension. TSV files must have a `.tsv` extension. Excel files should be in `.xlsx`, `.xlsb` or `.xls` format.
 
 The first row must contain the column headings, which must match the **names** (not labels, so far) of your schema fields **exactly**.
 
 The `tags` field, if present, must be comma-separated internally (CSV has no trouble escaping commas). 
 
-If your schema contains areas, plain text (with properly escaped newlines, thanks to the CSV export feature of your spreadsheet) can be imported for those columns.
+If your schema contains areas, plain text (with properly escaped newlines, in the case of CSV) can be imported for those columns.
 
 ## Importing a file
 
@@ -62,18 +62,19 @@ self.importBeforeInsert = function(job, record, piece, callback) {
 
 If you need to wait until the piece has already been inserted, override `importafterInsert` instead.
 
-## File formats beyond CSV
+## File formats beyond CSV, TSV and Excel
 
-`apostrophe-pieces-import` actually supports both `.csv` and `.tsv` (tab-separated values) right out of the box. But of course you want more.
+`apostrophe-pieces-import` supports `.csv`, `.tsv` and Excel formats right out of the box. But of course you want more.
 
 So you'll need to call `importAddFormat`, providing a name (the typical file extension) and a `format` object with, at a minimum, `parse`, `convert`, `sniff` and `count` properties.
 
-`parse` must be a function that, taking no arguments, returns a node.js stream that a file
-can be piped into; the stream should emit readable events and support the read() method
+`parse` can be one of two things:
+
+**1. Stream interface:** a function that, taking no arguments, returns a node.js stream that a file can be piped into; the stream should emit readable events and support the read() method
 in the usual way, and emit events in the usual way. The
 read() method of the stream must return an object with property names hopefully corresponding to schema field names.
 
-**Alternative:** `parse` may also be a function that, accepting the filename
+**2. Callback interface:** a function that, accepting the filename
 as its first argument and a callback as its second argument, parses the data and
 invokes the callback with `(null, array)` where `array` containing one object for each
 row, with property names corresponding
