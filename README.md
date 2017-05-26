@@ -16,7 +16,7 @@ modules: {
 }
 ```
 
-## In the `views/` folder of your module that extends pieces
+## In `views/managerModal.html` within your module that extends pieces
 
 ```markup
 {%- extends "managerModalBase.html" -%}
