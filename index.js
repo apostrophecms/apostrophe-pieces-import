@@ -11,7 +11,7 @@ module.exports = {
   improve: 'apostrophe-pieces',
   collectionName: 'aposPiecesImportJobs',
 
-  afterConstruct: function(self, callback) {
+  afterConstruct: function (self, callback) {
     // Make sure it's enabled for this particular subclass of pieces
     if (!self.options.import) {
       return setImmediate(callback);
@@ -22,32 +22,31 @@ module.exports = {
     return self.importEnsureCollection(callback);
   },
 
-  construct: function(self, options) {
-
+  construct: function (self, options) {
     self.importFormats = {
       csv: {
-        parse: function() {
+        parse: function () {
           return parse({ columns: true });
         },
         // Use the schema field converters for plaintext strings
         convert: 'string',
-        sniff: function(originalFilename, actualFilename) {
+        sniff: function (originalFilename, actualFilename) {
           return originalFilename.match(/\.csv$/i);
         },
-        count: function(filename, callback) {
+        count: function (filename, callback) {
           return countLinesInFile(filename, callback);
         }
       },
       tsv: {
-        parse: function() {
+        parse: function () {
           return parse({ columns: true, delimiter: '\t' });
         },
         // Use the schema field converters for plaintext strings
         convert: 'string',
-        sniff: function(originalFilename, actualFilename) {
+        sniff: function (originalFilename, actualFilename) {
           return originalFilename.match(/\.tsv$/i);
         },
-        count: function(filename, callback) {
+        count: function (filename, callback) {
           return countLinesInFile(filename, callback);
         }
       },
@@ -90,13 +89,12 @@ module.exports = {
     // with an error if any, and the number of records in the file as the second argument. It is
     // used for progress display. An approximate number is acceptable.
 
-    self.importAddFormat = function(name, format) {
+    self.importAddFormat = function (name, format) {
       self.importFormats[name] = format;
     };
 
-    self.importAddRoutes = function() {
-
-      self.route('post', 'import-modal', function(req, res) {
+    self.importAddRoutes = function () {
+      self.route('post', 'import-modal', function (req, res) {
         return res.send(self.render(req, 'importModal', {
           options: {
             label: self.label,
@@ -106,10 +104,9 @@ module.exports = {
         }));
       });
 
-      self.route('post', 'import-progress', function(req, res) {
-
+      self.route('post', 'import-progress', function (req, res) {
         var _id = self.apos.launder.id(req.body._id);
-        return self.db.findOne({ _id: _id }, function(err, job) {
+        return self.db.findOne({ _id: _id }, function (err, job) {
           if (err) {
             console.error(err);
             return respond({ failed: true });
@@ -126,16 +123,15 @@ module.exports = {
           return respond(job);
         });
 
-        function respond(info) {
+        function respond (info) {
           self.importBeforeProgress(info);
           return res.send({ status: 'ok', job: info._id && info, html: self.render(req, 'importProgress', info) });
         }
-
       });
 
-      self.route('post', 'import-cancel', function(req, res) {
+      self.route('post', 'import-cancel', function (req, res) {
         var _id = self.apos.launder.id(req.body._id);
-        return self.db.update({ _id: _id }, { $set: { canceling: true } }, function(err) {
+        return self.db.update({ _id: _id }, { $set: { canceling: true } }, function (err) {
           // There really isn't much we can do if this didn't work.
           if (err) {
             console.error(err);
@@ -144,7 +140,7 @@ module.exports = {
         });
       });
 
-      self.route('post', 'import', self.apos.middleware.files, function(req, res) {
+      self.route('post', 'import', self.apos.middleware.files, function (req, res) {
         var file = req.files.file;
         if (!file) {
           return res.send({ status: 'required' });
@@ -162,7 +158,7 @@ module.exports = {
 
         // Do the real work, without worrying about the browser hanging up
 
-        return async.series([ insertAndSniff, count, storeCount ], function(err) {
+        return async.series([ insertAndSniff, count, storeCount ], function (err) {
           if (err) {
             console.error(err);
             return self.importFailed(job);
@@ -178,14 +174,14 @@ module.exports = {
           } else {
             // Allow the simpler type of parse function to drive the
             // same methods that otherwise listen to a stream
-            return job.format.parse(file.path, function(err, data) {
+            return job.format.parse(file.path, function (err, data) {
               if (err) {
                 console.error(err);
                 return self.importFailed(job);
               }
               var i = 0;
               job.parser = {
-                read: function() {
+                read: function () {
                   if (i === data.length) {
                     self.importFinished(job);
                     return false;
@@ -198,9 +194,9 @@ module.exports = {
           }
         });
 
-        function insertAndSniff(callback) {
+        function insertAndSniff (callback) {
           // Insert the job in the jobs collection, then sniff the format
-          return self.db.insert(job, function(err) {
+          return self.db.insert(job, function (err) {
             if (err) {
               return res.send({ status: 'error' });
             }
@@ -217,8 +213,8 @@ module.exports = {
           });
         }
 
-        function count(callback) {
-          return self.importCount(job, file.path, function(err, total) {
+        function count (callback) {
+          return self.importCount(job, file.path, function (err, total) {
             if (err) {
               return self.importFailed(job);
             }
@@ -227,18 +223,17 @@ module.exports = {
           });
         }
 
-        function storeCount(callback) {
+        function storeCount (callback) {
           return self.db.update({ _id: job._id }, { $set: { total: job.total } }, callback);
         }
       });
-
     };
 
     // Determine the file format, via the sniff methods of the various formats;
     // first match wins
-    self.importSniff = function(originalFilename, actualFilename) {
+    self.importSniff = function (originalFilename, actualFilename) {
       var name;
-      _.each(self.importFormats, function(format, _name) {
+      _.each(self.importFormats, function (format, _name) {
         if (format.sniff(originalFilename, actualFilename)) {
           name = _name;
           return false;
@@ -248,11 +243,11 @@ module.exports = {
     };
 
     // Count the records for progress display purposes, via the count method of the format
-    self.importCount = function(job, filename, callback) {
+    self.importCount = function (job, filename, callback) {
       return job.format.count(filename, callback);
     };
 
-    self.importRecordsWhileAvailable = function(job) {
+    self.importRecordsWhileAvailable = function (job) {
       if (job.reading) {
         // Don't double-invoke this loop as we want to import the records
         // serially and in order. We get pelted with readable events
@@ -260,7 +255,7 @@ module.exports = {
         return;
       }
       job.reading = true;
-      function one() {
+      function one () {
         if (job.canceling) {
           // If we're trying to cancel the job, don't process more records
           job.reading = false;
@@ -275,11 +270,11 @@ module.exports = {
           }
           return;
         }
-        return self.importCancelOrContinue(job, function() {
+        return self.importCancelOrContinue(job, function () {
           // Track that we're in mid-import of a record so the cancellation
           // code can wait
           job.importing = true;
-          return self.importRecord(job, record, function(err) {
+          return self.importRecord(job, record, function (err) {
             job.importing = false;
             if (err) {
               // This shouldn't happen for an ordinary bad record, that just increments the error count
@@ -297,9 +292,8 @@ module.exports = {
     // Otherwise invoke the callback. Note the callback is not
     // invoked at all in the event of a cancellation.
 
-    self.importCancelOrContinue = function(job, callback) {
-
-      return self.db.findOne({ _id: job._id }, function(err, _job) {
+    self.importCancelOrContinue = function (job, callback) {
+      return self.db.findOne({ _id: job._id }, function (err, _job) {
         if (err || (!_job)) {
           // We can't do much in this situation
           console.error(err, _job);
@@ -320,32 +314,30 @@ module.exports = {
 
         return async.series([ waitForLast, markCanceled, remove ]);
 
-        function waitForLast(callback) {
+        function waitForLast (callback) {
           // Don't wind up with the last item being imported surviving past
           // the remove() call
           if (!job.importing) {
             return callback(null);
           }
-          return setTimeout(function() {
+          return setTimeout(function () {
             return waitForLast(callback);
           }, 50);
         }
 
-        function markCanceled(callback) {
+        function markCanceled (callback) {
           return self.db.update({ _id: job._id }, { $set: { canceled: true, canceling: false } }, callback);
         }
 
-        function remove(callback) {
+        function remove (callback) {
           return self.apos.docs.db.remove({ importJobId: job._id }, callback);
         }
-
       });
-
     };
 
-    self.importEndOfFile = function(job) {
-      return self.importCancelOrContinue(job, function() {
-        return self.db.update({ _id: job._id }, { $set: { finished: true  } }, function(err) {
+    self.importEndOfFile = function (job) {
+      return self.importCancelOrContinue(job, function () {
+        return self.db.update({ _id: job._id }, { $set: { finished: true } }, function (err) {
           if (err) {
             // There's nothing more we can do to communicate about the job
             console.error(err);
@@ -354,11 +346,11 @@ module.exports = {
       });
     };
 
-    self.importRecord = function(job, record, callback) {
+    self.importRecord = function (job, record, callback) {
       var piece = self.newInstance();
       piece.importedAt = job.when;
       piece.importJobId = job._id;
-      var key = _.find(_.keys(record), function(key) {
+      var key = _.find(_.keys(record), function (key) {
         return key.match(/:key$/);
       });
       var keyField;
@@ -370,7 +362,7 @@ module.exports = {
       } else {
         return async.series([ convert, before, insert, after ], outcome);
       }
-      function outcome(err) {
+      function outcome (err) {
         // Don't flunk the whole job for one bad row, just report it
         if (err) {
           console.error(err);
@@ -379,10 +371,10 @@ module.exports = {
           return self.db.update({ _id: job._id }, { $inc: { accepted: 1, processed: 1 } }, callback);
         }
       }
-      function findForUpdate(callback) {
+      function findForUpdate (callback) {
         var query = {};
         query[keyField] = record[key];
-        return self.find(job.req, query).toObject(function(err, existing) {
+        return self.find(job.req, query).toObject(function (err, existing) {
           if (err) {
             return callback(err);
           }
@@ -393,31 +385,31 @@ module.exports = {
           return callback(null);
         });
       }
-      function convert(callback) {
+      function convert (callback) {
         return self.importConvert(job, record, piece, callback);
       }
-      function before(callback) {
+      function before (callback) {
         return self.importBeforeInsert(job, record, piece, callback);
       }
-      function beforeUpdate(callback) {
+      function beforeUpdate (callback) {
         return self.importBeforeUpdate(job, record, piece, callback);
       }
-      function insert(callback) {
+      function insert (callback) {
         return self.importInsert(job, piece, callback);
       }
-      function update(callback) {
+      function update (callback) {
         return self.importUpdate(job, piece, callback);
       }
-      function after(callback) {
+      function after (callback) {
         return self.importAfterInsert(job, record, piece, callback);
       }
-      function afterUpdate(callback) {
+      function afterUpdate (callback) {
         return self.importAfterUpdate(job, record, piece, callback);
       }
     };
 
-    self.importConvert = function(job, record, piece, callback) {
-      var schema = _.filter(self.schema, function(field) {
+    self.importConvert = function (job, record, piece, callback) {
+      var schema = _.filter(self.schema, function (field) {
         return _.has(record, field.name);
       });
       return self.apos.schemas.convert(job.req, schema, job.format.convert, record, piece, callback);
@@ -429,7 +421,7 @@ module.exports = {
     // already been used to do ordinary schema field type conversions, so
     // many properties of `piece` may already be set
 
-    self.importBeforeInsert = function(job, record, piece, callback) {
+    self.importBeforeInsert = function (job, record, piece, callback) {
       // It's OK to invoke this callback synchronously because we know the previous
       // operation (convert) is always async, so there is no stack crash risk. -Tom
       return callback(null);
@@ -443,17 +435,17 @@ module.exports = {
     // present since this is an update and we fetch the existing piece before
     // this point
 
-    self.importBeforeUpdate = function(job, record, piece, callback) {
+    self.importBeforeUpdate = function (job, record, piece, callback) {
       // It's OK to invoke this callback synchronously because we know the previous
       // operation (convert) is always async, so there is no stack crash risk. -Tom
       return callback(null);
     };
 
-    self.importInsert = function(job, piece, callback) {
+    self.importInsert = function (job, piece, callback) {
       return self.insert(job.req, piece, callback);
     };
 
-    self.importUpdate = function(job, piece, callback) {
+    self.importUpdate = function (job, piece, callback) {
       return self.update(job.req, piece, callback);
     };
 
@@ -464,7 +456,7 @@ module.exports = {
     // The piece has already been inserted at this point which may be helpful
     // if you need to know the _id
 
-    self.importAfterInsert = function(job, record, piece, callback) {
+    self.importAfterInsert = function (job, record, piece, callback) {
       // It's OK to invoke this callback synchronously because we know the previous
       // operation (insert) is always async, so there is no stack crash risk. -Tom
       return callback(null);
@@ -474,14 +466,14 @@ module.exports = {
     // data received  is available as `record`; it is an object with
     // property names based on the header row (or equivalent).
 
-    self.importAfterUpdate = function(job, record, piece, callback) {
+    self.importAfterUpdate = function (job, record, piece, callback) {
       // It's OK to invoke this callback synchronously because we know the previous
       // operation (insert) is always async, so there is no stack crash risk. -Tom
       return callback(null);
     };
 
-    self.importFailed = function(job, err) {
-      return self.db.update({ _id: job._id }, { $set: { failed: true  } }, function(err) {
+    self.importFailed = function (job, err) {
+      return self.db.update({ _id: job._id }, { $set: { failed: true } }, function (err) {
         if (err) {
           // There's nothing more we can do to communicate about the job
           console.error(err);
@@ -489,26 +481,25 @@ module.exports = {
       });
     };
 
-    self.importFinished = function(job) {
+    self.importFinished = function (job) {
       self.importFinishing = true;
     };
 
     // A chance to modify the data being provided to the importProgress.html template by overriding.
-    self.importBeforeProgress = function(info) {
+    self.importBeforeProgress = function (info) {
     };
 
-    self.importEnsureCollection = function(callback) {
+    self.importEnsureCollection = function (callback) {
       self.db = self.apos.db.collection(self.options.collectionName);
       return setImmediate(callback);
     };
 
-    self.importPushDefineRelatedTypes = function() {
+    self.importPushDefineRelatedTypes = function () {
       self.apos.push.browserMirrorCall('user', self, { 'tool': 'import-modal', stop: 'apostrophe-pieces' });
     };
 
-    self.importPushAssets = function() {
+    self.importPushAssets = function () {
       self.pushAsset('script', 'import-modal', { when: 'user' });
     };
-
   }
 };
