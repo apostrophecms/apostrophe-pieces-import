@@ -387,7 +387,7 @@ module.exports = {
             return callback(err);
           }
           if (!existing) {
-            return callback('update-notfound');
+            return callback('update-notfound ' + query[keyField]);
           }
           piece = existing;
           return callback(null);
