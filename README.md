@@ -46,6 +46,26 @@ Just click the "import" button in the "manage" view of your pieces and you'll be
 
 If you click "cancel" before the import is complete, all pieces imported so far are deleted.
 
+## Updating existing pieces
+
+You can also update existing pieces via this module.
+
+To do that, you will need a **key column** in your file. This column's name **must** be **exactly** the name of the existing field that uniquely identifies each row as an update of a specific existing piece, **followed by `:key`**.
+
+For instance, if you need to change the usernames of users in bulk, you might prepare a CSV file like this:
+
+```
+username:key,username
+bobsmith,bob.smith
+janedoe,jane.doe
+```
+
+> The key column is the *old* value. You may optionally also present a *new* value for that same column in a separate column without `:key`. You may also include other columns, as you see fit. The important thing is that you must have one and only one `:key` column in order to carry out updates.
+
+## Mixing inserts and updates
+
+If a row has no value for your `:key` column, it is treated as an insert, rather than an update.
+
 ## Extending the import process for your type
 
 By default, the importer simply uses apostrophe schemas to accept all of the fields. You can change this if you need to accept additional or differently formatted information.
@@ -76,7 +96,7 @@ read() method of the stream must return an object with property names hopefully 
 
 **2. Callback interface:** a function that, accepting the filename
 as its first argument and a callback as its second argument, parses the data and
-invokes the callback with `(null, array)` where `array` containing one object for each
+invokes the callback with `(null, array)` where `array` contains one object for each
 row, with property names corresponding
 to the column headers as appropriate. In the event of an error, the error should be
 passed to the callback as the first argument. This option is to be avoided for very large
@@ -136,7 +156,7 @@ module.exports = {
 
 ## Making new file formats available to everyone
 
-Pack it up in an npm module called, let's say, `pieces-import-xlsx`. Your `index.js` will look like:
+Pack it up in an npm module called, let's say, `pieces-import-fancyformat`. Your `index.js` will look like:
 
 ```javascript
 // node_modules/pieces-import-xlsx/index.js
@@ -160,9 +180,9 @@ This module further improves `apostrophe-pieces`. In `app.js` developers will wa
 // app.js
 modules: {
   'apostrophe-pieces-import': {},
-  'pieces-import-xlsx': {}
+  'pieces-import-fancyformat': {}
 }
 ```
 
-> To avoid confusion with our official, please don't call your own module `apostrophe-import-xlsx` without coordinating with us first. Feel free to use your own prefix.
+> To avoid confusion with our official modules, please don't call your own module `apostrophe-pieces-import-fancyformat` without coordinating with us first. Feel free to use your own prefix.
 

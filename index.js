@@ -358,7 +358,19 @@ module.exports = {
       var piece = self.newInstance();
       piece.importedAt = job.when;
       piece.importJobId = job._id;
-      return async.series([ convert, before, insert, after ], function(err) {
+      var key = _.find(_.keys(record), function(key) {
+        return key.match(/:key$/);
+      });
+      var keyField;
+      if (key) {
+        keyField = key.replace(/:key$/, '');
+      }
+      if (key && record[key]) {
+        return async.series([ findForUpdate, convert, beforeUpdate, update, afterUpdate ], outcome);
+      } else {
+        return async.series([ convert, before, insert, after ], outcome);
+      }
+      function outcome(err) {
         // Don't flunk the whole job for one bad row, just report it
         if (err) {
           console.error(err);
@@ -366,23 +378,49 @@ module.exports = {
         } else {
           return self.db.update({ _id: job._id }, { $inc: { accepted: 1, processed: 1 } }, callback);
         }
-      });
+      }
+      function findForUpdate(callback) {
+        var query = {};
+        query[keyField] = record[key];
+        return self.find(job.req, query).toObject(function(err, existing) {
+          if (err) {
+            return callback(err);
+          }
+          if (!existing) {
+            return callback('update-notfound');
+          }
+          piece = existing;
+          return callback(null);
+        });
+      }
       function convert(callback) {
         return self.importConvert(job, record, piece, callback);
       }
       function before(callback) {
         return self.importBeforeInsert(job, record, piece, callback);
       }
+      function beforeUpdate(callback) {
+        return self.importBeforeUpdate(job, record, piece, callback);
+      }
       function insert(callback) {
         return self.importInsert(job, piece, callback);
+      }
+      function update(callback) {
+        return self.importUpdate(job, piece, callback);
       }
       function after(callback) {
         return self.importAfterInsert(job, record, piece, callback);
       }
+      function afterUpdate(callback) {
+        return self.importAfterUpdate(job, record, piece, callback);
+      }
     };
     
     self.importConvert = function(job, record, piece, callback) {
-      return self.apos.schemas.convert(job.req, self.schema, job.format.convert, record, piece, callback);
+      var schema = _.filter(self.schema, function(field) {
+        return _.has(record, field.name);
+      });
+      return self.apos.schemas.convert(job.req, schema, job.format.convert, record, piece, callback);
     };
 
     // Override this method as you see fit. req is available as `job.req`. The
@@ -396,9 +434,27 @@ module.exports = {
       // operation (convert) is always async, so there is no stack crash risk. -Tom
       return callback(null);
     };
-    
+
+    // Override this method as you see fit. req is available as `job.req`. The
+    // data received  is available as `record`; it is an object with
+    // property names based on the header row (or equivalent). `convert` has
+    // already been used to do ordinary schema field type conversions, so
+    // many properties of `piece` may already be set, plus those already
+    // present since this is an update and we fetch the existing piece before
+    // this point
+
+    self.importBeforeUpdate = function(job, record, piece, callback) {
+      // It's OK to invoke this callback synchronously because we know the previous
+      // operation (convert) is always async, so there is no stack crash risk. -Tom
+      return callback(null);
+    };
+
     self.importInsert = function(job, piece, callback) {
       return self.insert(job.req, piece, callback);
+    };
+
+    self.importUpdate = function(job, piece, callback) {
+      return self.update(job.req, piece, callback);
     };
 
     // Override this method as you see fit. req is available as `job.req`. The
@@ -413,7 +469,17 @@ module.exports = {
       // operation (insert) is always async, so there is no stack crash risk. -Tom
       return callback(null);
     };
+
+    // Override this method as you see fit. req is available as `job.req`. The
+    // data received  is available as `record`; it is an object with
+    // property names based on the header row (or equivalent). 
     
+    self.importAfterUpdate = function(job, record, piece, callback) {
+      // It's OK to invoke this callback synchronously because we know the previous
+      // operation (insert) is always async, so there is no stack crash risk. -Tom
+      return callback(null);
+    };
+
     self.importFailed = function(job, err) {
       return self.db.update({ _id: job._id }, { $set: { failed: true  } }, function(err) {
         if (err) {

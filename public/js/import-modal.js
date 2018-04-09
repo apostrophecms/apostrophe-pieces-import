@@ -1,6 +1,4 @@
-// An editor modal for creating and updating pieces. An instance of this modal is created
-// each time you click "Add" or click to edit an existing piece. Relies on
-// [apostrophe-schemas](../apostrophe-schemas/index.html) to edit the fields.
+// A modal for importing pieces
 
 apos.define('apostrophe-pieces-import-modal', {
 
