@@ -36,7 +36,7 @@ CSV files must have a `.csv` extension. TSV files must have a `.tsv` extension. 
 
 The first row must contain the column headings, which must match the **names** (not labels, so far) of your schema fields **exactly**.
 
-The `tags` field, if present, must be comma-separated internally (CSV has no trouble escaping commas). 
+The `tags` field, if present, must be comma-separated internally (CSV has no trouble escaping commas).
 
 If your schema contains areas, plain text (with properly escaped newlines, in the case of CSV) can be imported for those columns.
 
@@ -50,7 +50,7 @@ If you click "cancel" before the import is complete, all pieces imported so far 
 
 You can also update existing pieces via this module.
 
-To do that, you will need a **key column** in your file. This column's name **must** be **exactly** the name of the existing field that uniquely identifies each row as an update of a specific existing piece, **followed by `:key`**.
+To do that, you will need one (and only one) **key column** in your file. This column's name **must be exactly the name of the existing field** that uniquely identifies each row as an update of a specific existing piece, **followed by `:key`**.
 
 For instance, if you need to change the usernames of users in bulk, you might prepare a CSV file like this:
 
@@ -60,7 +60,7 @@ bobsmith,bob.smith
 janedoe,jane.doe
 ```
 
-> The key column is the *old* value. You may optionally also present a *new* value for that same column in a separate column without `:key`. You may also include other columns, as you see fit. The important thing is that you must have one and only one `:key` column in order to carry out updates.
+The key column is the *old value*. You may optionally also present a *new value* for that same column in a separate column without `:key`. You may also include other columns, as you see fit. The important thing is that you must have one and only one `:key` column in order to carry out updates.
 
 ## Mixing inserts and updates
 
@@ -185,4 +185,3 @@ modules: {
 ```
 
 > To avoid confusion with our official modules, please don't call your own module `apostrophe-pieces-import-fancyformat` without coordinating with us first. Feel free to use your own prefix.
-

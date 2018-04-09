@@ -53,7 +53,7 @@ module.exports = {
       },
       excel: require('./lib/excel.js')
     };
-    
+
     // Add support for a new input format. `name` is the typical file extension, such as `csv`.
     // `format` is an object with, at a minimum, `parse`, `convert`, `sniff` and
     // `count` properties.
@@ -105,7 +105,7 @@ module.exports = {
           }
         }));
       });
-      
+
       self.route('post', 'import-progress', function(req, res) {
 
         var _id = self.apos.launder.id(req.body._id);
@@ -161,7 +161,7 @@ module.exports = {
         res.send({ status: 'ok', _id: job._id });
 
         // Do the real work, without worrying about the browser hanging up
-        
+
         return async.series([ insertAndSniff, count, storeCount ], function(err) {
           if (err) {
             console.error(err);
@@ -193,7 +193,7 @@ module.exports = {
                   return data[i++];
                 }
               };
-              self.importRecordsWhileAvailable(job);          
+              self.importRecordsWhileAvailable(job);
             });
           }
         });
@@ -216,7 +216,7 @@ module.exports = {
             return callback(null);
           });
         }
-        
+
         function count(callback) {
           return self.importCount(job, file.path, function(err, total) {
             if (err) {
@@ -226,14 +226,14 @@ module.exports = {
             return callback(null);
           });
         }
-        
+
         function storeCount(callback) {
           return self.db.update({ _id: job._id }, { $set: { total: job.total } }, callback);
         }
       });
 
     };
-    
+
     // Determine the file format, via the sniff methods of the various formats;
     // first match wins
     self.importSniff = function(originalFilename, actualFilename) {
@@ -246,7 +246,7 @@ module.exports = {
       });
       return name;
     };
-    
+
     // Count the records for progress display purposes, via the count method of the format
     self.importCount = function(job, filename, callback) {
       return job.format.count(filename, callback);
@@ -292,7 +292,7 @@ module.exports = {
       };
       one();
     };
-    
+
     // If the user has requested to cancel the job, cancel it.
     // Otherwise invoke the callback. Note the callback is not
     // invoked at all in the event of a cancellation.
@@ -342,7 +342,7 @@ module.exports = {
       });
 
     };
-    
+
     self.importEndOfFile = function(job) {
       return self.importCancelOrContinue(job, function() {
         return self.db.update({ _id: job._id }, { $set: { finished: true  } }, function(err) {
@@ -415,7 +415,7 @@ module.exports = {
         return self.importAfterUpdate(job, record, piece, callback);
       }
     };
-    
+
     self.importConvert = function(job, record, piece, callback) {
       var schema = _.filter(self.schema, function(field) {
         return _.has(record, field.name);
@@ -424,7 +424,7 @@ module.exports = {
     };
 
     // Override this method as you see fit. req is available as `job.req`. The
-    // data received  is available as `record`; it is an object with
+    // data received is available as `record`; it is an object with
     // property names based on the header row (or equivalent). `convert` has
     // already been used to do ordinary schema field type conversions, so
     // many properties of `piece` may already be set
@@ -459,11 +459,11 @@ module.exports = {
 
     // Override this method as you see fit. req is available as `job.req`. The
     // data received  is available as `record`; it is an object with
-    // property names based on the header row (or equivalent). 
+    // property names based on the header row (or equivalent).
     //
     // The piece has already been inserted at this point which may be helpful
     // if you need to know the _id
-    
+
     self.importAfterInsert = function(job, record, piece, callback) {
       // It's OK to invoke this callback synchronously because we know the previous
       // operation (insert) is always async, so there is no stack crash risk. -Tom
@@ -472,8 +472,8 @@ module.exports = {
 
     // Override this method as you see fit. req is available as `job.req`. The
     // data received  is available as `record`; it is an object with
-    // property names based on the header row (or equivalent). 
-    
+    // property names based on the header row (or equivalent).
+
     self.importAfterUpdate = function(job, record, piece, callback) {
       // It's OK to invoke this callback synchronously because we know the previous
       // operation (insert) is always async, so there is no stack crash risk. -Tom
@@ -488,11 +488,11 @@ module.exports = {
         }
       });
     };
-    
+
     self.importFinished = function(job) {
       self.importFinishing = true;
     };
-    
+
     // A chance to modify the data being provided to the importProgress.html template by overriding.
     self.importBeforeProgress = function(info) {
     };
@@ -501,7 +501,7 @@ module.exports = {
       self.db = self.apos.db.collection(self.options.collectionName);
       return setImmediate(callback);
     };
-    
+
     self.importPushDefineRelatedTypes = function() {
       self.apos.push.browserMirrorCall('user', self, { 'tool': 'import-modal', stop: 'apostrophe-pieces' });
     };
