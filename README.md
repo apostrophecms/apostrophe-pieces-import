@@ -52,10 +52,10 @@ You can also update existing pieces via this module.
 
 To do that, you will need one (and only one) **key column** in your file. This column's name **must be exactly the name of the existing field followed by `:key`**. This will identify each row as an update of a specific existing piece.
 
-### Using the `:key` column
-- To properly match an existing record to update, you need to choose a unique field for the `:key` field. For example, for "user" pieces that could be a username or email, for "places" that could be the title or address.
-- The `:key` field does not need to match updated column, but it would usually make sense for that to be the case.
-- Other columns may also be updated, but would not have a paired `:key` column if there already is one.
+### Using the key column
+- To properly match an existing record to update, you need to choose a unique field for the key column (e.g., `email:key`). For example, for "user" pieces that could be a username or email, for "places" that could be the title or address.
+- The key field does not need to match updated column, but it would usually make sense for that to be the case.
+- Other columns may also be updated, but would not have a paired key column if there already is one.
 
 For instance, if you need to change the usernames of users in bulk, you might prepare a CSV file like this:
 
