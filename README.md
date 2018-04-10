@@ -50,7 +50,12 @@ If you click "cancel" before the import is complete, all pieces imported so far 
 
 You can also update existing pieces via this module.
 
-To do that, you will need one (and only one) **key column** in your file. This column's name **must be exactly the name of the existing field** that uniquely identifies each row as an update of a specific existing piece, **followed by `:key`**.
+To do that, you will need one (and only one) **key column** in your file. This column's name **must be exactly the name of the existing field followed by `:key`**. This will identify each row as an update of a specific existing piece.
+
+### Using the key column
+- To properly match an existing record to update, you need to choose a unique field for the key column (e.g., `email:key`). For example, for "user" pieces that could be a username or email, for "places" that could be the title or address.
+- The key field does not need to match updated column, and often won't, but it is allowed. For example, `email:key` could be the key column, using the existing data from `email`, then a separate `email` column in the CSV could have updated email addresses.
+- Other columns may also be updated, but would not have a paired key column if there already is one.
 
 For instance, if you need to change the usernames of users in bulk, you might prepare a CSV file like this:
 
@@ -60,7 +65,9 @@ bobsmith,bob.smith
 janedoe,jane.doe
 ```
 
-The key column is the *old value*. You may optionally also present a *new value* for that same column in a separate column without `:key`. You may also include other columns, as you see fit. The important thing is that you must have one and only one `:key` column in order to carry out updates.
+The `:key` column is the *pre-existing value*. You may optionally also present a *new value* for that same column in a separate column without `:key`, as shown.
+
+You may also include other columns, as previously mentioned. Any columns on the piece that are not included will be left untouched. The important thing is that you must have one and only one `:key` column in order to carry out updates.
 
 ## Mixing inserts and updates
 
