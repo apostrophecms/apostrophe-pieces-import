@@ -54,7 +54,7 @@ To do that, you will need one (and only one) **key column** in your file. This c
 
 ### Using the key column
 - To properly match an existing record to update, you need to choose a unique field for the key column (e.g., `email:key`). For example, for "user" pieces that could be a username or email, for "places" that could be the title or address.
-- The key field does not need to match updated column, but it would usually make sense for that to be the case.
+- The key field does not need to match updated column, and often won't, but it is allowed. For example, `email:key` could be the key column, using the existing data from `email`, then a separate `email` column in the CSV could have updated email addresses.
 - Other columns may also be updated, but would not have a paired key column if there already is one.
 
 For instance, if you need to change the usernames of users in bulk, you might prepare a CSV file like this:
