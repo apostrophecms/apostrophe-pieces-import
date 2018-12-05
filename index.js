@@ -382,7 +382,10 @@ module.exports = {
       function findForUpdate(callback) {
         var query = {};
         query[keyField] = record[key];
-        return self.find(job.req, query).toObject(function(err, existing) {
+        // It's perfectly reasonable to update/replace something
+        // in the trash or unpublished, including making it live again
+        // or publishing it
+        return self.find(job.req, query).trash(null).published(null).toObject(function(err, existing) {
           if (err) {
             return callback(err);
           }

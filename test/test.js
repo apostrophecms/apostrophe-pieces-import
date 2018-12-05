@@ -73,42 +73,11 @@ describe('apostrophe-pieces-import', function () {
   var jobId;
 
   it('start importing the products', function (done) {
-    var req = apos.tasks.getReq();
-    request.post({
-      url: 'http://localhost:7780/modules/products/import',
-      formData: {
-        file: fs.createReadStream(apos.rootDir + '/data/temp/test.csv')
-      },
-      json: true
-    }, function(err, response, body) {
-      assert(!err);
-      assert(response.statusCode === 200);
-      assert(body.status === 'ok');
-      jobId = body._id;
-      done();
-    });
+    submitJob(done);
   });
 
   it('import concludes within 4 seconds', function (done) {
-    setTimeout(check, 4000);
-    function check() {
-      request.post({
-        url: 'http://localhost:7780/modules/products/import-progress',
-        json: true,
-        body: {
-          _id: jobId
-        }
-      }, function(err, response, body) {
-        assert(!err);
-        assert(response.statusCode === 200);
-        assert(body.status === 'ok');
-        assert(body.job.finished);
-        assert(!body.job.errors);
-        assert(body.job.processed === 50);
-        jobId = body._id;
-        done();
-      });
-    }
+    monitorJob(50, done);
   });
 
   it('check results', function() {
@@ -129,6 +98,84 @@ describe('apostrophe-pieces-import', function () {
   });
 
   it('start importing the updates', function (done) {
+    submitJob(done);
+  });
+
+  it('import of updates concludes within 4 seconds', function (done) {
+    monitorJob(10, done);
+  });
+
+  it('check results', function() {
+    return apos.products.find(apos.tasks.getReq()).toArray().then(function(pieces) {
+      assert(pieces.length === 50);
+      assert(_.find(pieces, { title: 'Cheese Food #00000' }));
+      assert(!_.find(pieces, { title: 'Cheese #00000' }));
+    });
+  });
+
+  it('should be able to trash and unpublish a product via an update: generate file', function() {
+    var products = [
+      {
+        title: 'Cheese Food #00000',
+        'slug:key': 'cheese-00000',
+        published: '0',
+        trash: '1'
+      }
+    ];
+    fs.writeFileSync(apos.rootDir + '/data/temp/test.csv', stringify(products, { header: true }));
+  });
+
+  it('should be able to trash and unpublish a product via an update: submit job', function(done) {
+    submitJob(done);
+  });
+
+  it('should be able to trash and unpublish a product via an update: submit job', function(done) {
+    monitorJob(1, done);
+  });
+
+  it('verify unable to fetch trashed, unpublished product normally', function() {
+    return apos.products.find(apos.tasks.getReq(), { slug: 'cheese-00000' }).toObject().then(function(piece) {
+      assert(!piece);
+    });
+  });
+
+  it('verify properties of trashed, unpublished product', function() {
+    return apos.docs.db.findOne({ slug: 'cheese-00000' }).then(function(piece) {
+      assert(piece);
+      assert(piece.trash);
+      assert(!piece.published);
+    });
+  });
+
+  it('should be able to untrash and republish a product via an update: generate file', function() {
+    var products = [
+      {
+        title: 'Cheese Food #00000',
+        'slug:key': 'cheese-00000',
+        published: '1',
+        trash: '0'
+      }
+    ];
+    fs.writeFileSync(apos.rootDir + '/data/temp/test.csv', stringify(products, { header: true }));
+  });
+
+  it('should be able to untrash and republish a product via an update: submit job', function(done) {
+    submitJob(done);
+  });
+
+  it('should be able to untrash and republish a product via an update: submit job', function(done) {
+    monitorJob(1, done);
+  });
+
+  it('able to fetch untrashed, republished product normally', function() {
+    return apos.products.find(apos.tasks.getReq(), { slug: 'cheese-00000' }).toObject().then(function(piece) {
+      assert(piece);
+      assert(piece.published);
+      assert(!piece.trash);
+    });
+  });
+
+  function submitJob(done) {
     var req = apos.tasks.getReq();
     request.post({
       url: 'http://localhost:7780/modules/products/import',
@@ -143,9 +190,9 @@ describe('apostrophe-pieces-import', function () {
       jobId = body._id;
       done();
     });
-  });
+  }
 
-  it('import of updates concludes within 4 seconds', function (done) {
+  function monitorJob(expect, done) {
     setTimeout(check, 4000);
     function check() {
       request.post({
@@ -160,20 +207,12 @@ describe('apostrophe-pieces-import', function () {
         assert(body.status === 'ok');
         assert(body.job.finished);
         assert(!body.job.errors);
-        assert(body.job.processed === 10);
+        assert(body.job.processed === expect);
         jobId = body._id;
         done();
       });
     }
-  });
-
-  it('check results', function() {
-    return apos.products.find(apos.tasks.getReq()).toArray().then(function(pieces) {
-      assert(pieces.length === 50);
-      assert(_.find(pieces, { title: 'Cheese Food #00000' }));
-      assert(!_.find(pieces, { title: 'Cheese #00000' }));
-    });
-  });
+  }
 
 });
 
