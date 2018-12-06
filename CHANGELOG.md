@@ -1,5 +1,9 @@
 # Changelog
 
+** 2.1.2
+
+* Markdown typo that made the docs hard to read. No code changes.
+
 ** 2.1.1
 
 * The update feature, which is activated by adding `:key` to the end of one and only one column name in the header row, can now match docs that are unpublished or in the trash, and update them. As a consequence it is also possible to publish (or unpublish) a doc via this module, by setting the `publish` property to `1` (published) or `0` (unpublished). Similarly, you may trash a doc via this module by setting the `trash` property to `1` (in the trash) or `0` (not in the trash).

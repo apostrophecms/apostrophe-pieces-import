@@ -1,6 +1,6 @@
 {
   "name": "apostrophe-pieces-import",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "Import pieces from CSV, TSV, Excel and formats you add yourself as pieces in Apostrophe, with a nice UI",
   "main": "index.js",
   "scripts": {
