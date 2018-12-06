@@ -32,15 +32,15 @@ apos.define('apostrophe-pieces-import-modal', {
           return data.submit();
         }
       });
-      
+
       return setImmediate(callback);
     };
-    
+
     self.startProgress = function() {
       self.progressInterval = setInterval(self.updateProgress, 1000);
       self.updateProgress();
     };
-    
+
     self.updateProgress = function() {
       return self.api('import-progress', { _id: self.jobId }, function(data) {
         if (data.status === 'ok') {
@@ -53,7 +53,7 @@ apos.define('apostrophe-pieces-import-modal', {
         }
       });
     };
-    
+
     self.afterHide = function() {
       if (self.progressInterval) {
         clearInterval(self.progressInterval);
@@ -62,7 +62,7 @@ apos.define('apostrophe-pieces-import-modal', {
         apos.change(self.manager.name);
       }
     };
-    
+
     self.hideForm = function() {
       self.$el.find('[data-apos-form]').hide();
     };
@@ -82,6 +82,7 @@ apos.define('apostrophe-pieces-import-modal', {
         apos.ui.globalBusy(false);
         return callback(null);
       }, function(err) {
+        apos.utils.error(err);
         // Even if some sort of network error occurs we can't do anything useful
         // at this point by keeping the modal up in this situation
         apos.ui.globalBusy(false);

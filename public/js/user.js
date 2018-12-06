@@ -14,7 +14,7 @@ apos.define('apostrophe-pieces', {
         self.import();
       });
     };
-    
+
     self.import = function() {
       return self.getTool('import-modal');
     };

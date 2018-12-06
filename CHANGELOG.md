@@ -1,5 +1,13 @@
 # Changelog
 
+** 2.1.1
+
+* The update feature, which is activated by adding `:key` to the end of one and only one column name in the header row, can now match docs that are unpublished or in the trash, and update them. As a consequence it is also possible to publish (or unpublish) a doc via this module, by setting the `publish` property to `1` (published) or `0` (unpublished). Similarly, you may trash a doc via this module by setting the `trash` property to `1` (in the trash) or `0` (not in the trash).
+
+* This module now has a unit test suite.
+
+* This module now passes `eslint` checks, which caught the need to properly add `async` as a dependency.
+
 ** 2.1.0
 
 * Support for updates as well as inserts. If you wish to make updates, you must have a "key column," labeled like this: `username:key`. Rows that have a value for the key column will update the existing piece with the corresponding value for that column. Note that you can update that same property, if you wish to, by presenting it in a separate column without the `:key` suffix. 

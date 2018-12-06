@@ -66,6 +66,35 @@ The key column is the *old value*. You may optionally also present a *new value*
 
 If a row has no value for your `:key` column, it is treated as an insert, rather than an update.
 
+## Updating unpublished and trashed documents is allowed
+
+Since version 2.11, you may update docs that are unpublished or in the trash.
+
+Note that it is also possible to publish (or unpublish) a doc via this module, by setting the `publish` property to `1` (published) or `0` (unpublished).
+
+Similarly, you may trash a doc via this module by setting the `trash` property to `1` (in the trash) or `0` (not in the trash).
+
+## Localization, imports and `apostrophe-workflow`
+
+When using `apostrophe-workflow` for localization new inserts made with the `apostrophe-pieces-import` module will always be in the current locale. The same is true for updates.
+
+However, you may use the `workflowGuid` column as an update key to import, for instance, a Spanish (`es`) version of an existing English (`en`) document so that they remain connected.
+
+Let's say you've already imported a piece in English. When you first do that, it also comes into existence in other locales, however it is in the trash until you choose to edit it in other languages.
+
+Now let's say we want to use the importer to bring in a Spanish version. If the English version of a piece has the `workflowGuid` `abcdef`, you could switch to the Spanish locale in the usual way and then import a CSV file like this:
+
+```
+workflowGuid:key,title,trash
+abcef,En Español,0
+111
+
+Note that in addition to setting the title, we are setting `trash` to `0` so that the piece becomes visible in Spanish.
+
+This works because `workflowGuid` always has the same value across all locales for the same document.
+
+> Currently imports are always to the draft locale. They must go through the usual commit process. Consider using the batch commit operation in the "Manage" view for your piece type.
+
 ## Extending the import process for your type
 
 By default, the importer simply uses apostrophe schemas to accept all of the fields. You can change this if you need to accept additional or differently formatted information.

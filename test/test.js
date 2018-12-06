@@ -176,7 +176,6 @@ describe('apostrophe-pieces-import', function () {
   });
 
   function submitJob(done) {
-    var req = apos.tasks.getReq();
     request.post({
       url: 'http://localhost:7780/modules/products/import',
       formData: {
@@ -215,7 +214,6 @@ describe('apostrophe-pieces-import', function () {
   }
 
 });
-
 
 function padInteger (i, places) {
   var s = i + '';

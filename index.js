@@ -3,8 +3,6 @@ var cuid = require('cuid');
 var _ = require('lodash');
 var fs = require('fs');
 var async = require('async');
-var path = require('path');
-var targetFilePath = path.resolve(__dirname, './data.txt');
 var countLinesInFile = require('./lib/countLinesInFile.js');
 
 module.exports = {
@@ -111,7 +109,7 @@ module.exports = {
         var _id = self.apos.launder.id(req.body._id);
         return self.db.findOne({ _id: _id }, function(err, job) {
           if (err) {
-            console.error(err);
+            self.apos.utils.error(err);
             return respond({ failed: true });
           }
           if (!job) {
@@ -138,7 +136,7 @@ module.exports = {
         return self.db.update({ _id: _id }, { $set: { canceling: true } }, function(err) {
           // There really isn't much we can do if this didn't work.
           if (err) {
-            console.error(err);
+            self.apos.utils.error(err);
           }
           return res.send({ status: 'ok' });
         });
@@ -164,7 +162,7 @@ module.exports = {
 
         return async.series([ insertAndSniff, count, storeCount ], function(err) {
           if (err) {
-            console.error(err);
+            self.apos.utils.error(err);
             return self.importFailed(job);
           }
           if (job.format.parse.length === 0) {
@@ -180,7 +178,7 @@ module.exports = {
             // same methods that otherwise listen to a stream
             return job.format.parse(file.path, function(err, data) {
               if (err) {
-                console.error(err);
+                self.apos.utils.error(err);
                 return self.importFailed(job);
               }
               var i = 0;
@@ -302,7 +300,7 @@ module.exports = {
       return self.db.findOne({ _id: job._id }, function(err, _job) {
         if (err || (!_job)) {
           // We can't do much in this situation
-          console.error(err, _job);
+          self.apos.utils.error(err, _job);
           return;
         }
         if (!_job.canceling) {
@@ -345,10 +343,10 @@ module.exports = {
 
     self.importEndOfFile = function(job) {
       return self.importCancelOrContinue(job, function() {
-        return self.db.update({ _id: job._id }, { $set: { finished: true  } }, function(err) {
+        return self.db.update({ _id: job._id }, { $set: { finished: true } }, function(err) {
           if (err) {
             // There's nothing more we can do to communicate about the job
-            console.error(err);
+            self.apos.utils.error(err);
           }
         });
       });
@@ -373,7 +371,7 @@ module.exports = {
       function outcome(err) {
         // Don't flunk the whole job for one bad row, just report it
         if (err) {
-          console.error(err);
+          self.apos.utils.error(err);
           return self.db.update({ _id: job._id }, { $inc: { errors: 1, processed: 1 } }, callback);
         } else {
           return self.db.update({ _id: job._id }, { $inc: { accepted: 1, processed: 1 } }, callback);
@@ -484,10 +482,10 @@ module.exports = {
     };
 
     self.importFailed = function(job, err) {
-      return self.db.update({ _id: job._id }, { $set: { failed: true  } }, function(err) {
+      return self.db.update({ _id: job._id }, { $set: { failed: true } }, function(err) {
         if (err) {
           // There's nothing more we can do to communicate about the job
-          console.error(err);
+          self.apos.utils.error(err);
         }
       });
     };
