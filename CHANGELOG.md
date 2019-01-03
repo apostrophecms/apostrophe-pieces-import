@@ -1,5 +1,9 @@
 # Changelog
 
+** 2.1.3
+
+* Documented how to import joins. No code changes.
+
 ** 2.1.2
 
 * Markdown typo that made the docs hard to read. No code changes.

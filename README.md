@@ -74,6 +74,12 @@ Note that it is also possible to publish (or unpublish) a doc via this module, b
 
 Similarly, you may trash a doc via this module by setting the `trash` property to `1` (in the trash) or `0` (not in the trash).
 
+## Importing joins
+
+`joinByOne` and `joinByArray` columns may be imported. For `joinByOne` the column can match the `title` or the `_id` of the doc you're joining to (of course, title is not a useful option if they are not unique). For joinByArray it can be a comma-separated list of titles or `_id`s, however note that titles with commas cannot be matched in this way; in practice a list of `_id`s is the best option here.
+
+The doc being joined to must already exist; if not the join will not be populated. If you need to import both, import things being joined to before the things that join with them.
+
 ## Localization, imports and `apostrophe-workflow`
 
 When using `apostrophe-workflow` for localization new inserts made with the `apostrophe-pieces-import` module will always be in the current locale. The same is true for updates.
