@@ -51,6 +51,25 @@ module.exports = {
       },
       excel: require('./lib/excel.js')
     };
+    
+    let superGetManagerControls = self.getManagerControls;
+    self.getManagerControls = function (req) {
+      let controls = _.clone(superGetManagerControls(req));
+      const addIndex = _.findIndex(controls, function (control) {
+        return control.action.match(/^(upload|create)/);
+      });
+      let control = {
+        type: 'minor',
+        label: 'Import',
+        action: 'import-' + self.apos.utils.cssName(self.name)
+      };
+      if (addIndex >= 0) {
+        controls.splice(addIndex, 0, control);
+      } else {
+        controls.push(control);
+      }
+      return controls;
+    };
 
     // Add support for a new input format. `name` is the typical file extension, such as `csv`.
     // `format` is an object with, at a minimum, `parse`, `convert`, `sniff` and
