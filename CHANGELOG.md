@@ -1,14 +1,19 @@
 # Changelog
 
-** 2.1.3
+## 2.1.4
+
+* You no longer have to override `views/managerModal.html`, and you should stop. Once you stop, this module will be able to play nicely with `apostrophe-pieces-export` and both buttons can appear.
+* Unit tests showing that the new `importAsRichText: true` option for area and singleton fields works properly. Note that this option is in the `apostrophe` module itself, which must also be up to date.
+
+## 2.1.3
 
 * Documented how to import joins. No code changes.
 
-** 2.1.2
+## 2.1.2
 
 * Markdown typo that made the docs hard to read. No code changes.
 
-** 2.1.1
+## 2.1.1
 
 * The update feature, which is activated by adding `:key` to the end of one and only one column name in the header row, can now match docs that are unpublished or in the trash, and update them. As a consequence it is also possible to publish (or unpublish) a doc via this module, by setting the `publish` property to `1` (published) or `0` (unpublished). Similarly, you may trash a doc via this module by setting the `trash` property to `1` (in the trash) or `0` (not in the trash).
 
@@ -16,15 +21,15 @@
 
 * This module now passes `eslint` checks, which caught the need to properly add `async` as a dependency.
 
-** 2.1.0
+## 2.1.0
 
 * Support for updates as well as inserts. If you wish to make updates, you must have a "key column," labeled like this: `username:key`. Rows that have a value for the key column will update the existing piece with the corresponding value for that column. Note that you can update that same property, if you wish to, by presenting it in a separate column without the `:key` suffix. 
 
-** 2.0.1
+## 2.0.1
 
 * Documentation improvements.
 
-** 2.0.0
+## 2.0.0
 
 * Introduced simplified alternate interface for custom file format parsers. If a stream interface is not available you can use a simple callback interface, at the price of keeping all of the data in RAM during the import, which for many file formats (notably Excel) is acceptable. A convenience wrapper automatically invokes these simplified parsers without the need to change the rest of the import logic.
 * Added simple Excel import. The first worksheet in the file is imported. The standard string-based validators are applied to each field, much as if it were a CSV file.
