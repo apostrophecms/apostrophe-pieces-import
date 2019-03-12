@@ -511,5 +511,24 @@ module.exports = {
       self.pushAsset('script', 'import-modal', { when: 'user' });
     };
 
+    let superGetManagerControls = self.getManagerControls;
+    self.getManagerControls = function (req) {
+      let controls = _.clone(superGetManagerControls(req));
+      const addIndex = _.findIndex(controls, function (control) {
+        return control.action.match(/^(upload|create)/);
+      });
+      let control = {
+        type: 'minor',
+        label: 'Import',
+        action: 'import-' + self.apos.utils.cssName(self.name)
+      };
+      if (addIndex >= 0) {
+        controls.splice(addIndex, 0, control);
+      } else {
+        controls.push(control);
+      }
+      return controls;
+    };
+
   }
 };

@@ -30,7 +30,24 @@ describe('apostrophe-pieces-import', function () {
           name: 'product',
           import: true,
           alias: 'products',
-          sort: { title: 1 }
+          sort: { title: 1 },
+          addFields: [
+            {
+              type: 'area',
+              name: 'richText',
+              widgets: {
+                'apostrophe-rich-text': {}
+              },
+              importAsRichText: true
+            },
+            {
+              type: 'area',
+              name: 'plaintext',
+              widgets: {
+                'apostrophe-rich-text': {}
+              }
+            }
+          ]
         },
 
         'test-as-admin': {
@@ -64,7 +81,9 @@ describe('apostrophe-pieces-import', function () {
     var products = _.map(_.range(0, 50), function(i) {
       return {
         title: 'Cheese #' + padInteger(i, 5),
-        slug: 'cheese-' + padInteger(i, 5)
+        slug: 'cheese-' + padInteger(i, 5),
+        richText: '<h4>This is rich text</h4>',
+        plaintext: '<h4>This will get escaped</h4>'
       };
     });
     fs.writeFileSync(apos.rootDir + '/data/temp/test.csv', stringify(products, { header: true }));
@@ -84,6 +103,8 @@ describe('apostrophe-pieces-import', function () {
     return apos.products.find(apos.tasks.getReq()).toArray().then(function(pieces) {
       assert(pieces.length === 50);
       assert(pieces[0].title === 'Cheese #00000');
+      assert(pieces[0].richText.items[0].content === '<h4>This is rich text</h4>');
+      assert(pieces[0].plaintext.items[0].content === '&lt;h4&gt;This will get escaped&lt;/h4&gt;');
     });
   });
 

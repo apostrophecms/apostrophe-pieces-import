@@ -16,19 +16,11 @@ modules: {
 }
 ```
 
-## In `views/managerModal.html` of your module that extends pieces
-
-```markup
-{%- extends "managerModalBase.html" -%}
-{%- import "piecesMacros.html" as pieces with context -%}
-{%- import "piecesImportMacros.html" as piecesImport with context -%}
-{%- import 'apostrophe-ui:components/buttons.html' as buttons with context -%}
-
-{%- block controls -%}
-  {{ buttons.minor('Import', { action: 'import-' + data.options.name }) }}
-  {{ pieces.manageControls() }}
-{%- endblock -%}
-```
+> That's all you have to do! In earlier versions, you had to override
+`views/managerModal.html`, but that is no longer necessary. It is still supported
+for backwards compatibility, but you should remove the override so that
+other extensions like `apostrophe-workflow` and `apostrophe-pieces-export`
+behave sensibly when used together with this module.
 
 ## Preparing the data file
 
@@ -45,6 +37,15 @@ If your schema contains areas, plain text (with properly escaped newlines, in th
 Just click the "import" button in the "manage" view of your pieces and you'll be invited to pick a file. Once you select it a progress display appears. When the import completes, statistics are provided displaying the count of successful records and errors.
 
 If you click "cancel" before the import is complete, all pieces imported so far are deleted.
+
+## Importing rich text (HTML) rather than plaintext
+
+By default, if you create a column in your CSV file for a field of type `area`, it will be imported as plaintext. Any special characters like `<` and `>` will be escaped so the user can see them. HTML is not supported.
+
+To import areas as rich text HTML markup, set the `importAsRichText: true` property of
+the `area` field in your schema. 
+
+> For historical reasons, the `apostrophe-pieces-export` module behaves the opposite way by default. You can set `importAsRichText: true` or `exportAsPlaintext: true` to force them to behave the same way.
 
 ## Updating existing pieces
 
