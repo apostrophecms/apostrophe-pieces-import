@@ -515,7 +515,7 @@ module.exports = {
     self.getManagerControls = function (req) {
       let controls = _.clone(superGetManagerControls(req));
       if (self.options.import) {
-      const addIndex = _.findIndex(controls, function (control) {
+        const addIndex = _.findIndex(controls, function (control) {
           return control.action.match(/^(upload|create)/);
         });
         let control = {

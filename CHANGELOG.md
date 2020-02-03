@@ -1,5 +1,11 @@
 # Changelog
 
+** 2.1.4
+
+* "Import" button now appears only for the modules that had the `import: true` flag set. The button displayed for other modules was always nonfunctional, so this is not a change in functionality. Thanks to Sebastian Geschke for this fix.
+
+* `csv-parse` has been updated to the latest version to address an npm audit vulnerability report.
+
 ** 2.1.3
 
 * Documented how to import joins. No code changes.
