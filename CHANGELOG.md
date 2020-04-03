@@ -1,5 +1,9 @@
 # Changelog
 
+** 2.1.6
+
+* Updates eslint test.
+
 ** 2.1.5
 
 * "Import" button now appears only for the modules that had the `import: true` flag set. The button displayed for other modules was always nonfunctional, so this is not a change in functionality. Thanks to Sebastian Geschke for this fix.
@@ -28,7 +32,7 @@
 
 ** 2.1.0
 
-* Support for updates as well as inserts. If you wish to make updates, you must have a "key column," labeled like this: `username:key`. Rows that have a value for the key column will update the existing piece with the corresponding value for that column. Note that you can update that same property, if you wish to, by presenting it in a separate column without the `:key` suffix. 
+* Support for updates as well as inserts. If you wish to make updates, you must have a "key column," labeled like this: `username:key`. Rows that have a value for the key column will update the existing piece with the corresponding value for that column. Note that you can update that same property, if you wish to, by presenting it in a separate column without the `:key` suffix.
 
 ** 2.0.1
 
