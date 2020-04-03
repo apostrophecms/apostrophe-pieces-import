@@ -25,7 +25,7 @@ describe('apostrophe-pieces-import', function () {
 
         'apostrophe-pieces-import': {},
 
-        'products': {
+        products: {
           extend: 'apostrophe-pieces',
           name: 'product',
           import: true,
