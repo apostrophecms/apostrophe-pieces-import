@@ -1,6 +1,8 @@
+[![CircleCI](https://circleci.com/gh/apostrophecms/apostrophe-pieces-import/tree/master.svg?style=svg)](https://circleci.com/gh/apostrophecms/apostrophe-pieces-import/tree/master)
+
 # apostrophe-pieces-import
 
-This module adds an optional import feature to all `apostrophe-pieces` in an [Apostrophe](http://apostrophecms.org) project.
+This module adds an optional import feature to all `apostrophe-pieces` in an [Apostrophe](https://apostrophecms.com) project.
 
 ## in app.js
 
@@ -43,7 +45,7 @@ If you click "cancel" before the import is complete, all pieces imported so far 
 By default, if you create a column in your CSV file for a field of type `area`, it will be imported as plaintext. Any special characters like `<` and `>` will be escaped so the user can see them. HTML is not supported.
 
 To import areas as rich text HTML markup, set the `importAsRichText: true` property of
-the `area` field in your schema. 
+the `area` field in your schema.
 
 > For historical reasons, the `apostrophe-pieces-export` module behaves the opposite way by default. You can set `importAsRichText: true` or `exportAsPlaintext: true` to force them to behave the same way.
 

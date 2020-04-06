@@ -38,7 +38,10 @@ module.exports = {
       },
       tsv: {
         parse: function() {
-          return parse({ columns: true, delimiter: '\t' });
+          return parse({
+            columns: true,
+            delimiter: '\t'
+          });
         },
         // Use the schema field converters for plaintext strings
         convert: 'string',
@@ -126,7 +129,11 @@ module.exports = {
 
         function respond(info) {
           self.importBeforeProgress(info);
-          return res.send({ status: 'ok', job: info._id && info, html: self.render(req, 'importProgress', info) });
+          return res.send({
+            status: 'ok',
+            job: info._id && info,
+            html: self.render(req, 'importProgress', info)
+          });
         }
 
       });
@@ -156,11 +163,14 @@ module.exports = {
         };
         // LACK OF RETURN STATEMENT IS INTENTIONAL. Let the browser go on its way and start
         // AJAXing us back for progress updates. -Tom
-        res.send({ status: 'ok', _id: job._id });
+        res.send({
+          status: 'ok',
+          _id: job._id
+        });
 
         // Do the real work, without worrying about the browser hanging up
 
-        return async.series([ insertAndSniff, count, storeCount ], function(err) {
+        return async.series([insertAndSniff, count, storeCount], function(err) {
           if (err) {
             self.apos.utils.error(err);
             return self.importFailed(job);
@@ -316,7 +326,7 @@ module.exports = {
           job.parser.end();
         }
 
-        return async.series([ waitForLast, markCanceled, remove ]);
+        return async.series([waitForLast, markCanceled, remove]);
 
         function waitForLast(callback) {
           // Don't wind up with the last item being imported surviving past
@@ -330,7 +340,12 @@ module.exports = {
         }
 
         function markCanceled(callback) {
-          return self.db.update({ _id: job._id }, { $set: { canceled: true, canceling: false } }, callback);
+          return self.db.update({ _id: job._id }, {
+            $set: {
+              canceled: true,
+              canceling: false
+            }
+          }, callback);
         }
 
         function remove(callback) {
@@ -364,17 +379,27 @@ module.exports = {
         keyField = key.replace(/:key$/, '');
       }
       if (key && record[key]) {
-        return async.series([ findForUpdate, convert, beforeUpdate, update, afterUpdate ], outcome);
+        return async.series([findForUpdate, convert, beforeUpdate, update, afterUpdate], outcome);
       } else {
-        return async.series([ convert, before, insert, after ], outcome);
+        return async.series([convert, before, insert, after], outcome);
       }
       function outcome(err) {
         // Don't flunk the whole job for one bad row, just report it
         if (err) {
           self.apos.utils.error(err);
-          return self.db.update({ _id: job._id }, { $inc: { errors: 1, processed: 1 } }, callback);
+          return self.db.update({ _id: job._id }, {
+            $inc: {
+              errors: 1,
+              processed: 1
+            }
+          }, callback);
         } else {
-          return self.db.update({ _id: job._id }, { $inc: { accepted: 1, processed: 1 } }, callback);
+          return self.db.update({ _id: job._id }, {
+            $inc: {
+              accepted: 1,
+              processed: 1
+            }
+          }, callback);
         }
       }
       function findForUpdate(callback) {
@@ -504,21 +529,24 @@ module.exports = {
     };
 
     self.importPushDefineRelatedTypes = function() {
-      self.apos.push.browserMirrorCall('user', self, { 'tool': 'import-modal', stop: 'apostrophe-pieces' });
+      self.apos.push.browserMirrorCall('user', self, {
+        tool: 'import-modal',
+        stop: 'apostrophe-pieces'
+      });
     };
 
     self.importPushAssets = function() {
       self.pushAsset('script', 'import-modal', { when: 'user' });
     };
 
-    let superGetManagerControls = self.getManagerControls;
+    const superGetManagerControls = self.getManagerControls;
     self.getManagerControls = function (req) {
-      let controls = _.clone(superGetManagerControls(req));
+      const controls = _.clone(superGetManagerControls(req));
       if (self.options.import) {
         const addIndex = _.findIndex(controls, function (control) {
           return control.action.match(/^(upload|create)/);
         });
-        let control = {
+        const control = {
           type: 'minor',
           label: 'Import',
           action: 'import-' + self.apos.utils.cssName(self.name)
