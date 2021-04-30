@@ -391,6 +391,9 @@ module.exports = {
             $inc: {
               errors: 1,
               processed: 1
+            },
+            $addToSet: {
+              errorMessages: err
             }
           }, callback);
         } else {
