@@ -7,6 +7,18 @@
     <tr class="{{ 'apos-pieces-import-errors' if data.errors }}">
       <th>{{ __('Errors') }}</th><td>{{ data.errors }}</td>
     </tr>
+    {% if data.errors %}
+      <tr class="{{ 'apos-pieces-import-errors' if data.errors }}">
+        <th>{{ __('Error Messages') }}</th>
+        <td>
+          <ul>
+          {% for message in data.errorMessages %}
+            <li class="apos-pieces-import-error-message">{{ message }}</li>
+          {% endfor %}
+          <ul>
+        </td>
+      </tr>
+    {% endif %}
   </table>
 {% elif data.failed %}
   <h3 class="apos-pieces-import-failed">{{ __('Import failed, the file is most likely not in a supported format') }}</h3>

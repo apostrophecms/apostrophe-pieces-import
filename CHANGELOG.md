@@ -1,5 +1,9 @@
 # Changelog
 
+** 2.2.0
+
+* Error messages are displayed in the import modal.
+
 ** 2.1.6
 
 * Updates eslint test.

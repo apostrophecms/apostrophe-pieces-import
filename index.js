@@ -170,7 +170,7 @@ module.exports = {
 
         // Do the real work, without worrying about the browser hanging up
 
-        return async.series([insertAndSniff, count, storeCount], function(err) {
+        return async.series([ insertAndSniff, count, storeCount ], function(err) {
           if (err) {
             self.apos.utils.error(err);
             return self.importFailed(job);
@@ -326,7 +326,7 @@ module.exports = {
           job.parser.end();
         }
 
-        return async.series([waitForLast, markCanceled, remove]);
+        return async.series([ waitForLast, markCanceled, remove ]);
 
         function waitForLast(callback) {
           // Don't wind up with the last item being imported surviving past
@@ -379,18 +379,27 @@ module.exports = {
         keyField = key.replace(/:key$/, '');
       }
       if (key && record[key]) {
-        return async.series([findForUpdate, convert, beforeUpdate, update, afterUpdate], outcome);
+        return async.series([ findForUpdate, convert, beforeUpdate, update, afterUpdate ], outcome);
       } else {
-        return async.series([convert, before, insert, after], outcome);
+        return async.series([ convert, before, insert, after ], outcome);
       }
       function outcome(err) {
         // Don't flunk the whole job for one bad row, just report it
         if (err) {
           self.apos.utils.error(err);
+          const displayError = err.message
+            ? err.message.includes('Document has neither slug nor title, giving up')
+            : err.includes('update-notfound');
+
           return self.db.update({ _id: job._id }, {
             $inc: {
               errors: 1,
               processed: 1
+            },
+            ...displayError && {
+              $addToSet: {
+                errorMessages: err.message || err
+              }
             }
           }, callback);
         } else {
