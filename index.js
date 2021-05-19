@@ -387,13 +387,19 @@ module.exports = {
         // Don't flunk the whole job for one bad row, just report it
         if (err) {
           self.apos.utils.error(err);
+          const displayError = err.message
+            ? err.message.includes('Document has neither slug nor title, giving up')
+            : err.includes('update-notfound');
+
           return self.db.update({ _id: job._id }, {
             $inc: {
               errors: 1,
               processed: 1
             },
-            $addToSet: {
-              errorMessages: err
+            ...displayError && {
+              $addToSet: {
+                errorMessages: err.message || err
+              }
             }
           }, callback);
         } else {
