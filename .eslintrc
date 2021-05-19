@@ -1,3 +1,4 @@
 {
-  "extends": "apostrophe"
+  "extends": "apostrophe",
+  "ignorePatterns": ["test/public"]
 }
