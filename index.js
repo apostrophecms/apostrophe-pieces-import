@@ -413,7 +413,23 @@ module.exports = {
       }
       function findForUpdate(callback) {
         var query = {};
-        query[keyField] = record[key];
+        var recordKey = record[key];
+        var keyFieldSchema = self.schema.find(function(field) {
+          if (field.name === keyField) {
+            return true;
+          }
+        });
+
+        if (keyFieldSchema) {
+          var keyFieldType = keyFieldSchema.type;
+          if (keyFieldType === 'integer') {
+            recordKey = Number.parseInt(recordKey);
+          } else if (keyFieldType === 'float') {
+            recordKey = Number.parseFloat(recordKey);
+          }
+        }
+
+        query[keyField] = recordKey;
         // It's perfectly reasonable to update/replace something
         // in the trash or unpublished, including making it live again
         // or publishing it

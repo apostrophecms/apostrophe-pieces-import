@@ -1,5 +1,9 @@
 # Changelog
 
+** 2.3.0
+
+* Support to update pieces when id is number.
+
 ** 2.2.0
 
 * Error messages are displayed in the import modal.
