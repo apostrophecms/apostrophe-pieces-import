@@ -28,7 +28,7 @@
     "fs-extra": "^1.0.0",
     "lodash": "^4.17.2",
     "split": "^1.0.0",
-    "xlsx": "^0.8.1"
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "apostrophe": "^2.72.3",
