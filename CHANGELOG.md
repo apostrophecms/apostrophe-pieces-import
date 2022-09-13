@@ -1,5 +1,9 @@
 # Changelog
 
+** UNRELEASED
+
+* Fix a denial-of-service vulnerability by bumping xlsx package to its latest version.
+
 ** 2.3.0
 
 * Support to update pieces when id is number.
