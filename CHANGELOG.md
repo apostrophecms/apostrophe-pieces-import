@@ -1,6 +1,6 @@
 # Changelog
 
-** UNRELEASED
+** 2.3.1
 
 * Fix a denial-of-service vulnerability by bumping xlsx package to its latest version.
 
