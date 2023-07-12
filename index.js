@@ -25,7 +25,10 @@ module.exports = {
     self.importFormats = {
       csv: {
         parse: function() {
-          return parse({ columns: true });
+          return parse({
+            columns: true,
+            bom: true
+          });
         },
         // Use the schema field converters for plaintext strings
         convert: 'string',
