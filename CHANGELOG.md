@@ -1,6 +1,6 @@
 # Changelog
 
-** UNRELEASED
+** 2.3.2 (2023-08-03)
 
 * Strip the UTF-8 BOM so that the first column's name is parsed correctly.
 
